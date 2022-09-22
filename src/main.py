@@ -8,7 +8,7 @@ from flask_swagger import swagger
 from flask_cors import CORS
 from utils import APIException, generate_sitemap
 from admin import setup_admin
-from models import db, User
+from models import db, User, Jugadores
 #from models import Person
 
 app = Flask(__name__)
@@ -38,6 +38,52 @@ def handle_hello():
     }
 
     return jsonify(response_body), 200
+
+@app.route('/jugadores', methods=['GET'])
+def get_jugadores():
+
+    jugadores = Jugadores.query.all()
+    
+    all_jugadores = list(map(lambda x: x.serialize(), jugadores))
+    print(all_jugadores)
+    response_body = {
+        "msg": "OK "
+    }
+
+    return jsonify(response_body), 200
+
+@app.route('/jugadores', methods=['POST'])
+def crear_jugador():
+    body = request.get_json()
+    # print(body)
+    
+    jugador_nuevo = Jugadores(nombre=body["nombre"], apellido=body["apellido"], equipo_id=body["equipo_id"])
+    # db.session.add(user1)
+    print(jugador_nuevo.serialize())
+    # db.session.commit()
+    # all_jugadores = list(map(lambda x: x.serialize(), jugadores))
+    # print(all_jugadores)
+
+    response_body = {
+        "msg": "OK "
+    }
+
+    return jsonify(response_body), 200
+
+@app.route('/jugadores/<int:jugador_id>', methods=['GET'])
+def get_one_jugador(jugador_id):
+
+    jugador = Jugadores.query.filter_by(id=jugador_id).first()
+    print(jugador.serialize())
+    
+   
+    response_body = {
+        "msg": "OK ",
+        "result": jugador.serialize()
+    }
+
+    return jsonify(response_body), 200
+
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
